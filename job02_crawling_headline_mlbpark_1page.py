@@ -21,8 +21,7 @@ urls = [
     ("KIWOOM", "https://mlbpark.donga.com/mp/b.php?search_select=sct&search_input=&select=spf&m=search&b=kbotown&query=%ED%82%A4%EC%9B%80")
 ]
 
-
-def crawl_mlbpark_posts(max_pages=100):
+def crawl_mlbpark_303page():
     # Chrome 옵션 설정
     options = ChromeOptions()
     options.add_argument(
@@ -42,54 +41,38 @@ def crawl_mlbpark_posts(max_pages=100):
         for category, base_url in urls:
             print(f"크롤링 시작: {category} - {base_url}")
 
-            # 초기 페이지 설정
-            page_num = 1
-            total_titles_for_category = 0
+            # 303 페이지 URL 생성 (30개씩 페이지당 게시물이 있으므로)
+            current_url = base_url + f'&p={1 + (303 - 1) * 30}'
+            print(f"현재 페이지 URL: {current_url}")
 
-            while page_num <= max_pages:
-                # 페이지 URL 생성
-                current_url = base_url + f'&p={1 + (page_num - 1) * 30}'
-                print(f"현재 페이지 URL: {current_url}")
+            # 페이지 로드
+            driver.get(current_url)
+            time.sleep(5)  # 페이지 로딩 대기
 
-                # 페이지 로드
-                driver.get(current_url)
-                time.sleep(5)  # 페이지 로딩 대기
+            # 페이지 내 제목 요소 찾기
+            title_elements = driver.find_elements(By.XPATH, '//a[contains(@class, "txt")]')
 
-                # 페이지 내 제목 요소 찾기
-                title_elements = driver.find_elements(By.XPATH, '//a[contains(@class, "txt")]')
+            # 제목 추출
+            titles = []
+            for element in title_elements:
+                try:
+                    title = element.text.strip()
+                    title = re.compile('[^가-힣 ]').sub(' ', title)  # 한글과 띄어쓰기만 남기
+                    titles.append((title, category))  # 제목과 카테고리 함께 저장
+                except Exception as e:
+                    print(f"제목 추출 중 오류: {e}")
 
-                # 제목 추출
-                titles = []
-                for element in title_elements:
-                    try:
-                        title = element.text.strip()
-                        title = re.compile('[^가-힣 ]').sub(' ', title)  # 한글과 띄어쓰기만 남기
-                        titles.append((title, category))  # 제목과 카테고리 함께 저장
-                    except Exception as e:
-                        print(f"제목 추출 중 오류: {e}")
+            # 모든 제목들을 하나의 리스트에 추가
+            all_titles.extend(titles)
 
-                # 추출된 제목이 없으면 크롤링 중단
-                if not titles:
-                    print(f"{category} 카테고리 크롤링 완료. 더 이상 제목이 없습니다.")
-                    break
-
-                # 모든 제목들을 하나의 리스트에 추가
-                all_titles.extend(titles)
-                total_titles_for_category += len(titles)
-
-                print(f"{page_num} 페이지에서 {len(titles)}개의 제목을 추출했습니다.")
-
-                # 다음 페이지로 이동
-                page_num += 1
-
-            print(f"{category}에서 총 {total_titles_for_category}개의 제목을 추출했습니다.")
+            print(f"{category}에서 {len(titles)}개의 제목을 추출했습니다.")
 
         # 결과 출력 및 CSV 저장
         print(f"총 {len(all_titles)}개의 게시글 제목 수집 완료")
 
         # 데이터프레임 생성 및 CSV 저장
         df = pd.DataFrame(all_titles, columns=['titles', 'category'])
-        df.to_csv('./crawling_data/mlbpark_titles_with_category_1page.csv', index=False, encoding='utf-8-sig')
+        df.to_csv('./crawling_data/mlbpark_titles_303page.csv', index=False, encoding='utf-8-sig')
 
         return df
 
@@ -101,6 +84,5 @@ def crawl_mlbpark_posts(max_pages=100):
         # 브라우저 종료
         driver.quit()
 
-
-# 크롤링 실행 (최대 100페이지까지 크롤링)
-crawl_mlbpark_posts()
+# 크롤링 실행 (303 페이지)
+crawl_mlbpark_303page()
