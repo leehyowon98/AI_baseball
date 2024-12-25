@@ -7,10 +7,10 @@ import pickle  # 객체 직렬화를 위한 pickle 모듈 임포트
 from konlpy.tag import Okt  # 한국어 형태소 분석을 위한 Okt 클래스 임포트
 from tensorflow.keras.preprocessing.text import Tokenizer  # 텍스트 전처리를 위한 Tokenizer 클래스 임포트
 from tensorflow.keras.preprocessing.sequence import pad_sequences  # 시퀀스 패딩을 위한 함수 임포트
-
+##
 # CSV 파일에서 데이터프레임 읽기
-df = pd.read_csv('./crawling_data/dcinside_titles_with_categories.csv')
-# df.drop_duplicates(inplace=True)      # 중복제거 (주석 처리됨)
+df = pd.read_csv('crawling_data/mlbpark_titles_with_category.csv')
+df.drop_duplicates(inplace=True)      # 중복제거 (주석 처리됨)
 df.reset_index(drop=True, inplace=True)  # 인덱스를 재설정하여 연속적인 인덱스 부여
 print(df.head())  # 데이터프레임의 처음 5행 출력
 df.info()  # 데이터프레임의 정보 출력
@@ -42,8 +42,10 @@ with open('./models/encoder.pickle', 'wb') as f:
 onehot_Y = to_categorical(labeled_y)  # 레이블을 원-핫 인코딩
 print(onehot_Y)  # 원-핫 인코딩 결과 출력
 
-# 각 뉴스 제목에 대해 형태소 분석 수행
+# 형태소 분석 전에 float 값을 문자열로 변환하고, NaN 값을 처리
 for i in range(len(X)):
+    # float 값을 문자열로 변환하고, NaN 값은 빈 문자열로 대체
+    X[i] = str(X[i]) if pd.notna(X[i]) else ''
     X[i] = okt.morphs(X[i], stem=True)  # 형태소 분석 후 어간 추출
 print(X)  # 형태소 분석 결과 출력
 
@@ -77,7 +79,7 @@ for i in range(len(tokened_X)):
         max = len(tokened_X[i])  # 최대 시퀀스 길이 업데이트
 print(max)  # 최대 시퀀스 길이 출력
 
-with open('./models/news_token_max_{}.pickle'.format(max), 'wb') as f:
+with open('./models/MP_KBO_token_max_{}.pickle'.format(max), 'wb') as f:
     pickle.dump(token, f)
 
 X_pad = pad_sequences(tokened_X, max)  # 시퀀스를 패딩하여 동일한 길이로 맞춤
@@ -90,7 +92,7 @@ print(X_train.shape, Y_train.shape)  # 학습 데이터의 형태 출력
 print(X_test.shape, Y_test.shape)  # 테스트 데이터의 형태 출력
 
 # 데이터 저장
-np.save('./crawling_data/KBO_X_train_wordsize_{}_max_{}'.format(wordsize, max), X_train)  # 학습 데이터 저장
-np.save('./crawling_data/KBO_Y_train_wordsize_{}_max_{}'.format(wordsize, max), Y_train)  # 학습 레이블 저장
-np.save('./crawling_data/KBO_X_test_wordsize_{}_max_{}'.format(wordsize, max), X_test)  # 테스트 데이터 저장
-np.save('./crawling_data/KBO_Y_test_wordsize_{}_max_{}'.format(wordsize, max), Y_test)  # 테스트 레이블 저장
+np.save('./crawling_data/MP_KBO_X_train_wordsize_{}_max_{}'.format(wordsize, max), X_train)  # 학습 데이터 저장
+np.save('./crawling_data/MP_KBO_Y_train_wordsize_{}_max_{}'.format(wordsize, max), Y_train)  # 학습 레이블 저장
+np.save('./crawling_data/MP_KBO_X_test_wordsize_{}_max_{}'.format(wordsize, max), X_test)  # 테스트 데이터 저장
+np.save('./crawling_data/MP_KBO_Y_test_wordsize_{}_max_{}'.format(wordsize, max), Y_test)  # 테스트 레이블 저장
