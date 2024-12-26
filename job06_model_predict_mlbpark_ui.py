@@ -29,12 +29,11 @@ class Exam(QWidget, form_window):
             # CSV 파일로 저장
             with open('./crawling_data/output.csv', 'w', encoding='utf-8') as file:  # CSV 파일 열기
                 file.write('titles,category\n')
-                file.write(text + ',KBO')  # 텍스트를 파일에 쓰기
+                file.write(text + ',KBO\n')  # 텍스트를 파일에 쓰기
             print("CSV 파일로 저장되었습니다.")
-            self.lbl_predict.setText("댓글 분석 중...")
+            self.lbl_predict.setText("CSV 파일로 저장되었습니다.")
 
             # 데이터 로드 및 전처리
-            self.lbl_predict.setText("댓글 분석 중...")
             df = pd.read_csv('./crawling_data/output.csv')
             df.drop_duplicates(inplace=True)
             df.reset_index(drop=True, inplace=True)
@@ -127,46 +126,10 @@ class Exam(QWidget, form_window):
             if predicts:
                 most_predicted = predicts[0][0]  # 첫 번째 예측 결과의 가장 높은 확률 클래스
                 self.lbl_predict.setText(f"예측 결과: {most_predicted}")
-            #all_labels = ['DOOSAN', 'HANWHA', 'KIA', 'KIWOOM', 'KT', 'LG', 'LOTTE', 'NC', 'SAMSUNG', 'SSG']
-                # 예측 팀에 따라 GIF 표시
-                if most_predicted == 'DOOSAN':
-                    movie = QMovie('image/doosan.gif')  # 한화 GIF 경로
-                    self.lbl_image.setMovie(movie)  # lbl_image에 GIF 설정
-                    movie.start()  # GIF 애니메이션 시작
-                elif most_predicted == 'HANWHA':
+
+                # 예측 팀이 한화일 경우 GIF 표시
+                if most_predicted == 'HANWHA':
                     movie = QMovie('image/hanwha.gif')  # 한화 GIF 경로
-                    self.lbl_image.setMovie(movie)  # lbl_image에 GIF 설정
-                    movie.start()  # GIF 애니메이션 시작
-                elif most_predicted == 'KIA':
-                    movie = QMovie('image/kia.gif')  # 한화 GIF 경로
-                    self.lbl_image.setMovie(movie)  # lbl_image에 GIF 설정
-                    movie.start()  # GIF 애니메이션 시작
-                elif most_predicted == 'KIWOOM':
-                    movie = QMovie('image/kiwoom.gif')  # 한화 GIF 경로
-                    self.lbl_image.setMovie(movie)  # lbl_image에 GIF 설정
-                    movie.start()  # GIF 애니메이션 시작
-                elif most_predicted == 'KT':
-                    movie = QMovie('image/kt.gif')  # 키움 GIF 경로
-                    self.lbl_image.setMovie(movie)  # lbl_image에 GIF 설정
-                    movie.start()  # GIF 애니메이션 시작
-                elif most_predicted == 'LG':
-                    movie = QMovie('image/lg.gif')  # 키움 GIF 경로
-                    self.lbl_image.setMovie(movie)  # lbl_image에 GIF 설정
-                    movie.start()  # GIF 애니메이션 시작
-                elif most_predicted == 'LOTTE':
-                    movie = QMovie('image/lotte.gif')  # 키움 GIF 경로
-                    self.lbl_image.setMovie(movie)  # lbl_image에 GIF 설정
-                    movie.start()  # GIF 애니메이션 시작
-                elif most_predicted == 'NC':
-                    movie = QMovie('image/nc.gif')  # 키움 GIF 경로
-                    self.lbl_image.setMovie(movie)  # lbl_image에 GIF 설정
-                    movie.start()  # GIF 애니메이션 시작
-                elif most_predicted == 'SAMSUNG':
-                    movie = QMovie('image/samsung.gif')  # 키움 GIF 경로
-                    self.lbl_image.setMovie(movie)  # lbl_image에 GIF 설정
-                    movie.start()  # GIF 애니메이션 시작
-                elif most_predicted == 'SSG':
-                    movie = QMovie('image/ssg.gif')  # 키움 GIF 경로
                     self.lbl_image.setMovie(movie)  # lbl_image에 GIF 설정
                     movie.start()  # GIF 애니메이션 시작
                 else:
