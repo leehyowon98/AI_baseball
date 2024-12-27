@@ -22,6 +22,21 @@ class Exam(QWidget, form_window):
         self.model = load_model(
             './models/MP_KBO_category_classification_model_0.6137456893920898.h5')
         self.btn_save.clicked.connect(self.save_and_predict)  # CSV 저장 및 예측 버튼 연결
+        self.textEdit_repl.installEventFilter(self)  # QTextEdit에 이벤트 필터 추가
+
+        # QTextEdit에 placeholder text 설정 (스타일시트 사용)
+        self.textEdit_repl.setStyleSheet("QTextEdit { color: gray; }")
+        self.textEdit_repl.setPlaceholderText("댓글을 입력해주세요...")
+
+    def eventFilter(self, source, event):
+        if source == self.textEdit_repl and event.type() == event.KeyPress:
+            if event.key() == 16777220:  # Enter 키
+                self.btn_save.click()  # 확인 버튼 클릭
+               # self.textEdit_repl.clear()  # 텍스트 입력창 초기화
+                return True
+        return super().eventFilter(source, event)
+
+
 
     def save_and_predict(self):
         text = self.textEdit_repl.toPlainText()  # QTextEdit에서 텍스트 가져오기
@@ -129,7 +144,45 @@ class Exam(QWidget, form_window):
 
                 # 예측 팀이 한화일 경우 GIF 표시
                 if most_predicted == 'HANWHA':
-                    movie = QMovie('image/hanwha.gif')  # 한화 GIF 경로
+                    movie = QMovie('image/hanwha.gif')
+                    self.lbl_image.setMovie(movie)  # lbl_image에 GIF 설정
+                    movie.start()  # GIF 애니메이션 시작
+
+                # 예측 팀이 다른 팀일 경우 GIF 표시 (중간에 다른 조건을 추가)
+                elif most_predicted == 'DOOSAN':
+                    movie = QMovie('image/DOOSAN.gif')
+                    self.lbl_image.setMovie(movie)  # lbl_image에 GIF 설정
+                    movie.start()  # GIF 애니메이션 시작
+                elif most_predicted == 'KIA':
+                    movie = QMovie('image/KIA.gif')
+                    self.lbl_image.setMovie(movie)  # lbl_image에 GIF 설정
+                    movie.start()  # GIF 애니메이션 시작
+                elif most_predicted == 'KIWOOM':
+                    movie = QMovie('image/KIWOOM.gif')
+                    self.lbl_image.setMovie(movie)  # lbl_image에 GIF 설정
+                    movie.start()  # GIF 애니메이션 시작
+                elif most_predicted == 'KT':
+                    movie = QMovie('image/KT.gif')
+                    self.lbl_image.setMovie(movie)  # lbl_image에 GIF 설정
+                    movie.start()  # GIF 애니메이션 시작
+                elif most_predicted == 'LG':
+                    movie = QMovie('image/LG.gif')
+                    self.lbl_image.setMovie(movie)  # lbl_image에 GIF 설정
+                    movie.start()  # GIF 애니메이션 시작
+                elif most_predicted == 'LOTTE':
+                    movie = QMovie('image/LOTTE.gif')
+                    self.lbl_image.setMovie(movie)  # lbl_image에 GIF 설정
+                    movie.start()  # GIF 애니메이션 시작
+                elif most_predicted == 'NC':
+                    movie = QMovie('image/NC.gif')
+                    self.lbl_image.setMovie(movie)  # lbl_image에 GIF 설정
+                    movie.start()  # GIF 애니메이션 시작
+                elif most_predicted == 'SAMSUNG':
+                    movie = QMovie('image/SAMSUNG.gif')
+                    self.lbl_image.setMovie(movie)  # lbl_image에 GIF 설정
+                    movie.start()  # GIF 애니메이션 시작
+                elif most_predicted == 'SSG':
+                    movie = QMovie('image/SSG.gif')
                     self.lbl_image.setMovie(movie)  # lbl_image에 GIF 설정
                     movie.start()  # GIF 애니메이션 시작
                 else:
